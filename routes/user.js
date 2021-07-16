@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var productHelper = require('../helper/product-helper');
 var userHelper = require('../helper/user-helper');
+var cartHelper = require('../helper/cart-helper')
 
 //auth
 function checkLogin(req,res,next){
@@ -21,7 +22,21 @@ router.get('/', function(req, res, next) {
 });
 
 router.get("/cart", checkLogin,(req, res) => {
+  let userid = req.session.user._id;
+  cartHelper.getCartProducts(userid).then((data) => {
+    console.log(data);
+  });
   res.render('user/user-cart')
+})
+
+router.get('/addtocart/:id',checkLogin, (req, res) => {
+  let user = req.session.user;
+  let productId = req.params.id;
+  cartHelper.addToCart(user._id, productId).then((data) => {
+    console.log(data);
+    res.redirect("/")
+  })
+
 })
 
 router.get("/orders", checkLogin,(req, res)=>{
